@@ -6,23 +6,23 @@ import datetime as dt
 pd.set_option('display.max_columns', None)
 
 
-# query result to df
-def ds_demand_cat(result):
+def ds_demand_cat(df):
+    # note: Mere modified this so it would take a df (so we can drop Nov DST before aggregating)
     """
     **(Downstream Demand - Categorized)**: 
-    This function takes the result of an SQL query asking for the hourly consumption 
+    This function takes a dataframe containing the hourly consumption 
     and zoning category (resdential, business, or commercial) of each meter in a specific portion of the grid 
     (usually specfied by taking all meters downstream of a certain transformer), 
-    where the hourly consumption appears in the column `kWh` and the zoning category appears in the column `type_of_consumer`. 
+    where the hourly consumption appears in the column `kWh` 
+    and the zoning category appears in the column `type_of_consumer`. 
     It returns a `pandas` dataframe with three columns indexed by hour: 
     `ds_kWh_comm` (total commercial/business consumption downstream of a given meter), 
     `ds_kWh_res` (total residential consumption downstream of a given meter), and 
     `ds_kWh_ind` (total industrial consumption downstream of a specfic meter.) 
-    It would be possible to restrict (e.g.) to residential consumers by using a command like `ds_demand_cat(sql_query)['ds_kWh_res']`.
+    It would be possible to restrict (e.g.) to residential consumers 
+    by using a command like `ds_demand_cat(sql_query)['ds_kWh_res']`.
     """
-    # Convert the SQL result to a Python dataframe.
-    df = result.DataFrame()
-    #@Mo This line switches over to the DataFrame() that returns three columns.
+    # This line switches over to the DataFrame() that returns three columns.
     df = df.groupby(['timestamp', 'type_of_consumer'])['kWh'].sum().reset_index()\
             .pivot(index=['timestamp'], columns='type_of_consumer', values='kWh')\
             .rename_axis(None, axis=1).reindex(columns=['business', 'residential', 'industrial'], fill_value=0)\
