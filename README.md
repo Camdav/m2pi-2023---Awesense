@@ -35,5 +35,6 @@ This repository contains
 
 * `mograph.py`: functions for graphing usage so that they're all consistent in both color and layout
 * `data_management_functions.py`: functions to manipulate our `pandas` data frames, selecting and aggregating certain data
-* `Awesense_ToU_Demo.ipynb`: a model of Time of Use tariffs including choosing peak hours to define the tariff
+* `ToU_Demo--Shiftable_Percentages`: a model of Time of Use tariffs including choosing peak hours to define the tariff and finding shiftable percentages
+* `ToU_Demo--Fourier_Transform`: an alternate model where we use a Fourier transform to find frequencies instead of using shiftable percentages
 * `Team1Awesense.pdf`: our M2PI final report with more background and in-depth discussion of the method (to come)
