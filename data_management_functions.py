@@ -29,6 +29,24 @@ def ds_demand_cat(df):
             .rename(columns = {'business': 'comm', 'residential':'res', 'industrial':'ind'}).add_prefix('ds_kWh_')
     return df
 
+# a rolling average
+def avg(df, period = 'M'):
+    """
+    **(Averaging Function)**: 
+    Takes (i) a data frame with integer entries and (ii) an averaging period (either 'M' for monthly or 'kD' where k is numeric for every k days).
+    Returns a data frame of averages which is indexed by the midpoint of each averaging period (or the rough midpoint in the monthly case). 
+    This can accept dataframes with any column names, and adds a period+`_avg_` prefix to the columns. 
+    Default behaviour (i.e. if we only give the `df` argument) is to return monthly averages.
+    """
+    if period == 'M': 
+        av = df.resample(period).mean().add_prefix(period + '_avg_').apply(lambda x: x.shift(-15, freq='D'))
+    if len(period) == 1 and period[-1] == 'D': 
+        av = df.resample(period).mean().add_prefix(period + '_avg_')\
+                .apply(lambda x: x.shift(12, freq='H'))
+    if len(period) > 1 and period[-1] == 'D': 
+        av = df.resample(period).mean().add_prefix(period + '_avg_')\
+                .apply(lambda x: x.shift(int(period[:-1])*12, freq='H'))
+
 
 # choose and manipulate relevant data from a df:
 
@@ -57,7 +75,7 @@ def timeframe_df(df, start_date, end_date):
     # add in relevant columns to consider weeks and hour of week for the shift
     tf_usage['week'] = tf_usage.timestamp.dt.isocalendar().week
     tf_usage['isoyear'] = tf_usage.timestamp.dt.isocalendar().year
-    tf_usage['weekhour'] = tf_usage['timestamp'].dt.dayofweek*24 
+    tf_usage['weekhour'] = tf_usage['timestamp'].dt.dayofweek*24\
                             + tf_usage['timestamp'].dt.hour
     
     return tf_usage
